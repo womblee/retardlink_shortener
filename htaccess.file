@@ -1,0 +1,46 @@
+RewriteEngine On
+RewriteBase /
+
+### ==============================================
+### Basic URL Redirects
+### ==============================================
+
+# Redirect old paths to new locations
+RewriteRule ^pages/(.*)$ /ps/$1 [R=301,L]
+RewriteRule ^downloads/(.*)$ /dl/$1 [R=301,L]
+RewriteRule ^donate$ /donate.html [R=301,L]
+
+### ==============================================
+### Clean URL Handling
+### ==============================================
+
+# Handle /r/code format
+RewriteRule ^r/([a-zA-Z0-9]+)$ ls/main.php?code=$1 [L,QSA]
+
+# Handle /r/code/p/password format
+RewriteRule ^r/([a-zA-Z0-9]+)/p/([^/]+)$ ls/main.php?code=$1&password=$2 [L,QSA]
+
+### ==============================================
+### Query String to Clean URL Redirects
+### ==============================================
+
+# Case with password
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+ls/main\.php\?code=([^\s&]+)(?:&password=([^\s&]+))? [NC]
+RewriteCond %{QUERY_STRING} (?:^|&)password=([^&]+) [NC]
+RewriteRule ^ls/main\.php$ /r/%1/p/%2? [R=301,L]
+
+# Case without password
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+ls/main\.php\?code=([^\s&]+)\s [NC]
+RewriteCond %{QUERY_STRING} !password= [NC]
+RewriteRule ^ls/main\.php$ /r/%1? [R=301,L]
+
+### ==============================================
+### Output Rewriting (URL Beautification)
+### ==============================================
+
+<IfModule mod_substitute.c>
+  <Location "/ls/">
+    AddOutputFilterByType SUBSTITUTE text/html
+    Substitute "s|https://nlog.us/main.php\?code=([a-zA-Z0-9]+)|https://nlog.us/r/$1|i"
+  </Location>
+</IfModule>
