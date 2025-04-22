@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetardLink - a blazing fast URL shortener</title>
+    
+    <link rel="shortcut icon" href="media/favicon.ico">
+    
+    <!-- custom css -->
+    <link rel="stylesheet" href="media/style.css">
+
+    <!-- new.css framework -->
+    <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <meta property="og:title" content="RetardLink - a blazing fast URL shortener">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.nlog.us/ls/index.html">
+    <meta property="og:description" content="You can make things easier for retards here.">
+    <meta name="theme-color" content="#000000">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3DNPAEKJCC"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-3DNPAEKJCC');</script>
+</head>
+<body>
+    <header>
+        <h1 class="site-title">RetardLink</h1>
+        <p class="site-description">
+            Make LINKS easier for RETARDS to CLICK
+            <br>
+            <a href="https://nlog.us/ls/client.html" style="display: inline-block; margin-top: 1rem;">
+                <button><i class="fas fa-computer"></i> Download Client</button>
+            </a>
+        </p>
+    </header>
+    </header>
+    
+    <main>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="create">Create Link</button>
+            <button class="tab-btn" data-tab="change">Change URL</button>
+            <button class="tab-btn" data-tab="delete">Delete Link</button>
+        </div>
+
+        <div id="create-tab" class="tab-content active">
+            <section>
+                <h2>Create link</h2>
+                
+                <div>
+                    <label for="original-url">URL</label>
+                    <input type="url" id="original-url" placeholder="https://example.com/your-long-url" size="26">
+                    <p class="help-text">Enter the full URL including https://</p>
+                </div>
+                
+                <div>
+                    <label for="custom-length">ID Length</label>
+                    <input type="number" id="custom-length" min="1" max="32" value="4">
+                    <p class="help-text">Choose between 1-32 characters (default: 4)</p>
+                </div>
+                
+                <div>
+                    <label for="password">Password (Optional)</label>
+                    <input type="password" id="password" placeholder="Leave empty for no password" size="26">
+                    <p class="help-text">Add a password to restrict access to your link</p>
+                </div>
+                
+
+                <button id="create-btn">
+                    <i class="fas fa-link"></i> Create link
+                </button>
+
+                <div id="create-message" class="message error-message" style="display: none;"></div>
+                
+                <div id="result-container" class="result-container">
+                    <h3 class="result-title">Your Link Has Been Created!</h3>
+                    
+                    <div>
+                        <label for="short-url">Short URL</label>
+                        <div class="input-group">
+                            <input type="text" id="short-url" readonly>
+                            <button class="copy-btn tooltip" data-target="short-url">
+                                <i class="fas fa-copy"></i>
+                                <span class="tooltiptext">Copy URL</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="access-key">Access Key</label>
+                        <div class="input-group">
+                            <input type="text" id="access-key" readonly>
+                            <button class="copy-btn tooltip" data-target="access-key">
+                                <i class="fas fa-copy"></i>
+                                <span class="tooltiptext">Copy Key</span>
+                            </button>
+                        </div>
+                        <p class="help-text"><strong>Important:</strong> Save this key to manage or delete your link later!</p>
+                    </div>
+                    
+                    <div>
+                        <label>Original URL</label>
+                        <p id="original-url-display" style="word-break: break-all;"></p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div id="change-tab" class="tab-content">
+            <section>
+                <h2>Change URL or Password</h2>
+                
+                <div>
+                    <label for="change-code">ID</label>
+                    <input type="text" id="change-code" placeholder="Enter the short code (e.g., Abc4)" size="26">
+                    <p class="help-text">The ID of the URL, not the URL itself</p>
+                </div>
+                
+                <div>
+                    <label for="change-key">Access Key</label>
+                    <input type="text" id="change-key" placeholder="Enter your access key" size="26">
+                    <p class="help-text">The unique key you received when creating the link</p>
+                </div>
+                
+                <div>
+                    <label for="new-url">New URL (optional)</label>
+                    <input type="url" id="new-url" placeholder="https://example.com/your-new-url" size="26">
+                    <p class="help-text">Enter the new full URL including https://</p>
+                </div>
+                
+                <div>
+                    <label for="new-password">New Password (optional)</label>
+                    <input type="password" id="new-password" placeholder="Enter new password or leave empty to remove" size="26">
+                    <p class="help-text">Change the password to your desired one</p>
+                </div>
+                
+                <button id="change-btn">
+                    <i class="fas fa-exchange-alt"></i> Update Link
+                </button>
+
+                <div id="change-message" class="message" style="display: none;"></div>
+            </section>
+        </div>
+        
+        <div id="delete-tab" class="tab-content">
+            <section>
+                <h2>Delete link</h2>
+                
+                <div>
+                    <label for="delete-code">ID</label>
+                    <input type="text" id="delete-code" placeholder="Enter the short code (e.g., Abc4)" size="26">
+                    <p class="help-text">The ID of the URL, not the URL itself</p>
+                </div>
+                
+                <div>
+                    <label for="delete-key-input">Access Key</label>
+                    <input type="text" id="delete-key-input" placeholder="Enter your access key" size="26">
+                    <p class="help-text">The unique key you received when creating the URL</p>
+                </div>
+                
+                <button id="delete-btn">
+                    <i class="fas fa-trash-alt"></i> Delete link
+                </button>
+                
+                <div id="delete-message" class="message" style="display: none;"></div>
+            </section>
+        </div>
+
+        <section id="statistics" class="stats-section">
+            <h2 class="stats-title">Global Link Statistics</h2>
+            <div id="stats-container" class="stats-grid">
+                <!-- Stats will be populated here by JavaScript -->
+            </div>
+            <div id="error-message" class="error-message" style="display: none;"></div>
+        </section>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="feature-title">Password Protection</h3>
+                <p>You can add a password to the link, because why not?</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-random"></i>
+                </div>
+                <h3 class="feature-title">Custom Length</h3>
+                <p>Length of the link ID, up to 32 characters</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h3 class="feature-title">URL Management</h3>
+                <p>Change or delete your links anytime</p>
+            </div>
+        
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                <h3 class="feature-title">Unlimited Links</h3>
+                <p>There are no limits on the number of links you can shorten!</p>
+            </div>
+        
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">No Account Required</h3>
+                <p>Use the service without having to create an account or sign up.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">No Tracking</h3>
+                <p>We don't track any personal data or activity on your shortened links.</p>
+            </div>
+        </div>
+        
+        <div class="faq-container">
+           <div class="faq-item">
+               <h3 class="faq-question">How long do shortened URLs last?</h3>
+               <div class="faq-answer">
+                   <p>Your shortened URLs last forever unless you manually delete them using the "Delete Link" tab. We don’t impose expiration dates.</p>
+               </div>
+           </div>
+           
+           <div class="faq-item">
+               <h3 class="faq-question">How do I change a URL?</h3>
+               <div class="faq-answer">
+                   <p>Go to the "Change URL" tab, enter your short code (e.g., "Abc4"), access key (from when you created the link), and the new URL. Hit "Update URL" to save changes.</p>
+               </div>
+           </div>
+           
+           <div class="faq-item">
+               <h3 class="faq-question">Why the name "RetardLink"?</h3>
+               <div class="faq-answer">
+                   <p>It’s honestly just a joke about the ease of use of this service. We’re sorry if it offends someone, our goal is a fast, no-bullshit service.</p>
+               </div>
+           </div>
+           
+           <div class="faq-item">
+               <h3 class="faq-question">What happens if I lose my access key?</h3>
+               <div class="faq-answer">
+                   <p>Without your access key, you can’t change or delete your link. Save it somewhere safe when you create a link. There’s no recovery option at the moment.</p>
+               </div>
+           </div>
+           
+           <div class="faq-item">
+               <h3 class="faq-question">Are my links secure?</h3>
+               <div class="faq-answer">
+                   <p>Links are as secure as you make them — add a password for extra protection. We don’t track or store personal data beyond what’s needed to run the service.</p>
+               </div>
+           </div>
+           
+           <div class="faq-item">
+               <h3 class="faq-question">Can I create custom short codes?</h3>
+               <div class="faq-answer">
+                   <p>Not yet! You can set the length (1-32 characters), but the code itself is randomly generated for uniqueness. Custom codes might come in the future.</p>
+               </div>
+           </div>
+        </div>
+
+        <div id="tos-modal" class="modal">
+            <div class="modal-content">
+                <h2>Before You Begin</h2>
+                
+                <div class="modal-scrollable-content">
+                    <p>
+                      To use this website, please review and accept our 
+                      <a href="https://nlog.us/ls/tos.html" target="_blank">Terms of Service</a> 
+                      and 
+                      <a href="https://nlog.us/ls/privacy_policy.html" target="_blank">Privacy Policy</a>.
+                    </p>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button id="tos-disagree-btn" class="modal-btn disagree-btn">Decline</button>
+                    <button id="tos-agree-btn" class="modal-btn agree-btn">Accept</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>RetardLink - make things easier for retards to click<br><a href="https://nlog.us/ls/tos.html">Terms Of Service</a> |  <a href="https://nlog.us/ls/privacy_policy.html">Privacy Policy</a> | <a href="https://nlog.us/ls/contact.html">Contact</a></p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal
+            const modal = document.getElementById("tos-modal");
+            const agreeBtn = document.getElementById("tos-agree-btn");
+            const disagreeBtn = document.getElementById("tos-disagree-btn");
+            
+            // Get all action buttons that should be disabled until agreement
+            const actionButtons = [
+                document.getElementById("create-btn"),
+                document.getElementById("change-btn"),
+                document.getElementById("delete-btn")
+            ];
+            
+            // Function to check if user has agreed to the terms
+            function hasAgreedToTerms() {
+                return document.cookie.split(';').some(item => item.trim().startsWith('tosAgreed=true'));
+            }
+            
+            // Function to set the agreement cookie (expires in 30 days)
+            function setAgreementCookie() {
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 30);
+                document.cookie = `tosAgreed=true; expires=${expiryDate.toUTCString()}; path=/`;
+            }
+            
+            // Function to remove the agreement cookie
+            function removeAgreementCookie() {
+                document.cookie = "tosAgreed=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            }
+            
+            // Function to enable all action buttons
+            function setButtons(status) {
+                actionButtons.forEach(button => {
+                    if (button) {
+                        button.disabled = !status;
+                    }
+                });
+            }
+            
+            // Check for existing agreement on page load
+            if (hasAgreedToTerms()) {
+                setButtons(true);
+            } else {
+                setButtons(false);
+                modal.style.display = "block";
+            }
+            
+            // Handle "I Agree" button click
+            agreeBtn.addEventListener("click", function() {
+                setAgreementCookie();
+                setButtons(true);
+                modal.style.display = "none";
+            });
+            
+            // Handle "I Disagree" button click
+            disagreeBtn.addEventListener("click", function() {
+                // Remove any existing agreement cookie
+                removeAgreementCookie();
+                
+                // Disable all action buttons
+                setButtons(false);
+                
+                // Close the modal
+                modal.style.display = "none";
+            });
+            
+            // Tab switching functionality
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    
+                    // Update active tab button
+                    tabBtns.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update active tab content
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${tab}-tab`).classList.add('active');
+                });
+            });
+            
+            // Password field focus/blur events and validation for both create and change tabs
+            const setupPasswordValidation = (passwordFieldId, requirementsContainerId) => {
+                const passwordField = document.getElementById(passwordFieldId);
+                
+                // Create requirements container if it doesn't exist
+                let passwordRequirements = document.getElementById(requirementsContainerId);
+                if (!passwordRequirements) {
+                    passwordRequirements = document.createElement('div');
+                    passwordRequirements.id = requirementsContainerId;
+                    passwordRequirements.className = 'password-requirements';
+                    passwordRequirements.style.display = 'none'; // Initially hidden
+                    
+                    // Insert after the help text paragraph
+                    const helpText = passwordField.nextElementSibling;
+                    if (helpText && helpText.classList.contains('help-text')) {
+                        helpText.parentNode.insertBefore(passwordRequirements, helpText.nextSibling);
+                    } else {
+                        passwordField.parentNode.insertBefore(passwordRequirements, passwordField.nextSibling);
+                    }
+                }
+                
+                // Set up requirement items
+                const requirementItems = {
+                    length: document.createElement('li'),
+                    letter: document.createElement('li'),
+                    number: document.createElement('li')
+                };
+                
+                requirementItems.length.textContent = '4-20 characters long';
+                requirementItems.letter.textContent = 'At least one letter';
+                requirementItems.number.textContent = 'At least one number';
+                
+                // Clear existing content and append new structure
+                passwordRequirements.innerHTML = '<p>Password requirements:</p>';
+                const requirementsList = document.createElement('ul');
+                Object.values(requirementItems).forEach(item => requirementsList.appendChild(item));
+                passwordRequirements.appendChild(requirementsList);
+                
+                // Show requirements on focus
+                passwordField.addEventListener('focus', function() {
+                    passwordRequirements.style.display = 'block';
+                    // Use setTimeout to ensure display:block takes effect before adding visible class
+                    setTimeout(() => {
+                        passwordRequirements.classList.add('visible');
+                    }, 10);
+                });
+                
+                // Hide requirements on blur (only if the field is empty)
+                passwordField.addEventListener('blur', function() {
+                    if (!this.value) {
+                        passwordRequirements.classList.remove('visible');
+                        // Wait for transition to complete before hiding completely
+                        setTimeout(() => {
+                            if (!passwordRequirements.classList.contains('visible')) {
+                                passwordRequirements.style.display = 'none';
+                            }
+                        }, 300); // Match this to your transition time (0.3s = 300ms)
+                    }
+                });
+                
+                // Live validation
+                passwordField.addEventListener('input', function() {
+                    const password = this.value;
+                    
+                    // Validate length
+                    if (password.length >= 4 && password.length <= 20) {
+                        requirementItems.length.classList.add('valid');
+                    } else {
+                        requirementItems.length.classList.remove('valid');
+                    }
+                    
+                    // Validate letter
+                    if (/[A-Za-z]/.test(password)) {
+                        requirementItems.letter.classList.add('valid');
+                    } else {
+                        requirementItems.letter.classList.remove('valid');
+                    }
+                    
+                    // Validate number
+                    if (/[0-9]/.test(password)) {
+                        requirementItems.number.classList.add('valid');
+                    } else {
+                        requirementItems.number.classList.remove('valid');
+                    }
+                });
+                
+                return {
+                    passwordField,
+                    passwordRequirements,
+                    requirementItems
+                };
+            };
+            
+            // Set up validation for the create tab
+            const createTabValidation = setupPasswordValidation('password', 'password-requirements');
+            
+            // Set up validation for the change tab
+            const changeTabValidation = setupPasswordValidation('new-password', 'new-password-requirements');
+            
+            // For existing password requirements in the create tab, set initial display state
+            const existingRequirements = document.getElementById('password-requirements');
+            if (existingRequirements) {
+                existingRequirements.style.display = 'none';
+            }
+            
+            // Create short link
+            document.getElementById('create-btn').addEventListener('click', function() {
+                const originalUrl = document.getElementById('original-url').value;
+                const customLength = document.getElementById('custom-length').value;
+                const password = document.getElementById('password').value;
+                
+                // Reset messages
+                const messageEl = document.getElementById('create-message');
+                messageEl.style.display = 'none';
+                document.getElementById('result-container').style.display = 'none';
+                
+                if (!originalUrl) {
+                    messageEl.textContent = 'Please enter a URL to shorten';
+                    messageEl.style.display = 'block';
+                    return;
+                }
+                
+                // Validate password if provided
+                if (password)
+                {
+                    // Check length
+                    if (password.length < 4 || password.length > 20) {
+                        messageEl.textContent = 'Password must be between 4 and 20 characters';
+                        messageEl.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Check complexity (at least one letter and one number)
+                    const hasLetter = /[A-Za-z]/.test(password);
+                    const hasNumber = /[0-9]/.test(password);
+                    
+                    if (!(hasLetter && hasNumber)) {
+                        messageEl.textContent = 'Password must contain at least one letter and one number';
+                        messageEl.style.display = 'block';
+                        return;
+                    }
+                }
+                
+                // Show loading state
+                const originalBtnText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+                this.disabled = true;
+                
+                // API call to create a short link
+                fetch(`main.php?action=create&url=${encodeURIComponent(originalUrl)}&length=${customLength}&password=${encodeURIComponent(password)}`)
+                    .then(response => {
+                        // Check if the response is ok (status in the range 200-299)
+                        if (!response.ok) {
+                            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Reset button
+                        this.innerHTML = originalBtnText;
+                        this.disabled = false;
+                        
+                        if (data.status === 'success') {
+                            // Transform the URL to the new format
+                            // Extract the code from the original short URL
+                            let shortUrl = data.short_url;
+                            let code = '';
+                            
+                            // Extract code parameter from the URL
+                            const codeMatch = shortUrl.match(/[?&]code=([^&]+)/);
+                            if (codeMatch && codeMatch[1]) {
+                                code = codeMatch[1];
+                                // Create the new format URL
+                                shortUrl = `https://nlog.us/r/${code}`;
+                            }
+                            
+                            // Display the result
+                            document.getElementById('short-url').value = shortUrl;
+                            document.getElementById('access-key').value = data.access_key;
+                            document.getElementById('original-url-display').textContent = data.original_url;
+                            document.getElementById('result-container').style.display = 'block';
+                            
+                            // Scroll to results
+                            document.getElementById('result-container').scrollIntoView({ behavior: 'smooth' });
+                        } else {
+                            messageEl.textContent = data.message || 'Unknown error occurred';
+                            messageEl.className = 'message error-message';
+                            messageEl.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        // Reset button
+                        this.innerHTML = originalBtnText;
+                        this.disabled = false;
+                        
+                        console.error('Error:', error);
+                        messageEl.textContent = 'Error: ' + error.message;
+                        messageEl.className = 'message error-message';
+                        messageEl.style.display = 'block';
+                    });
+            });
+            
+            // Change URL
+            document.getElementById('change-btn').addEventListener('click', function() {
+                const code = document.getElementById('change-code').value;
+                const key = document.getElementById('change-key').value;
+                const newUrl = document.getElementById('new-url').value;
+                const newPassword = document.getElementById('new-password').value; // Add this line for password
+                
+                // Reset message
+                const messageEl = document.getElementById('change-message');
+                messageEl.style.display = 'none';
+                
+                // Check if code and key are provided
+                if (!code || !key) {
+                    messageEl.textContent = 'Please fill in code and access key';
+                    messageEl.className = 'message error-message';
+                    messageEl.style.display = 'block';
+                    return;
+                }
+                
+                // Check if at least one of URL or password is provided
+                if (!newUrl && !newPassword) {
+                    messageEl.textContent = 'Please provide either a new URL or a new password';
+                    messageEl.className = 'message error-message';
+                    messageEl.style.display = 'block';
+                    return;
+                }
+
+                // Show loading state
+                const originalBtnText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                this.disabled = true;
+                
+                // Start with the required parameters
+                let apiUrl = `main.php?action=change&code=${encodeURIComponent(code)}&key=${encodeURIComponent(key)}`;
+                
+                // Add URL parameter if provided
+                if (newUrl) {
+                    apiUrl += `&url=${encodeURIComponent(newUrl)}`;
+                }
+                
+                // Add password parameter if provided
+                if (newPassword) {
+                    apiUrl += `&password=${encodeURIComponent(newPassword)}`;
+                }
+                
+                // API call to change URL and/or password
+                fetch(apiUrl)
+                    .then(response => {
+                        // Check if the response is ok
+                        if (!response.ok) {
+                            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Reset button
+                        this.innerHTML = originalBtnText;
+                        this.disabled = false;
+                        
+                        if (data.status === 'success') {
+                            messageEl.textContent = data.message || 'Link settings successfully updated';
+                            messageEl.className = 'message success-message';
+                            
+                            // Clear input fields that were used
+                            if (newUrl) document.getElementById('new-url').value = '';
+                            if (newPassword) document.getElementById('new-password').value = '';
+                        } else {
+                            messageEl.textContent = data.message || 'Failed to update link settings';
+                            messageEl.className = 'message error-message';
+                        }
+                        
+                        messageEl.style.display = 'block';
+                    })
+                    .catch(error => {
+                        // Reset button
+                        this.innerHTML = originalBtnText;
+                        this.disabled = false;
+                        
+                        console.error('Error:', error);
+                        messageEl.textContent = 'Error: ' + error.message;
+                        messageEl.className = 'message error-message';
+                        messageEl.style.display = 'block';
+                    });
+            });
+            
+            // Delete link
+            document.getElementById('delete-btn').addEventListener('click', function() {
+                const code = document.getElementById('delete-code').value;
+                const key = document.getElementById('delete-key-input').value;
+                
+                // Reset message
+                const messageEl = document.getElementById('delete-message');
+                messageEl.style.display = 'none';
+                
+                if (!code || !key) {
+                    messageEl.textContent = 'Please enter both short code and access key';
+                    messageEl.className = 'message error-message';
+                    messageEl.style.display = 'block';
+                    return;
+                }
+                
+                // Show loading state
+                const originalBtnText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                this.disabled = true;
+                
+                // API call to delete a link
+                fetch(`main.php?action=delete&code=${encodeURIComponent(code)}&key=${encodeURIComponent(key)}`)
+                    .then(response => {
+                        // Check if the response is ok
+                        if (!response.ok) {
+                            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Reset button
+                        this.innerHTML = originalBtnText;
+                        this.disabled = false;
+                        
+                        if (data.status === 'success') {
+                            messageEl.textContent = data.message || 'Link successfully deleted';
+                            messageEl.className = 'message success-message';
+                            
+                            // Clear input fields
+                            document.getElementById('delete-code').value = '';
+                            document.getElementById('delete-key-input').value = '';
+                        } else {
+                            messageEl.textContent = data.message || 'Failed to delete link';
+                            messageEl.className = 'message error-message';
+                        }
+                        
+                        messageEl.style.display = 'block';
+                    })
+                    .catch(error => {
+                        // Reset button
+                        this.innerHTML = originalBtnText;
+                        this.disabled = false;
+                        
+                        console.error('Error:', error);
+                        messageEl.textContent = 'Error: ' + error.message;
+                        messageEl.className = 'message error-message';
+                        messageEl.style.display = 'block';
+                    });
+            });
+            
+            // Copy to clipboard functionality
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    
+                    // Use modern clipboard API if available
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(input.value)
+                            .then(() => {
+                                // Update tooltip text
+                                const tooltip = this.querySelector('.tooltiptext');
+                                const originalText = tooltip.textContent;
+                                tooltip.textContent = 'Copied!';
+                                
+                                // Reset tooltip text after delay
+                                setTimeout(() => {
+                                    tooltip.textContent = originalText;
+                                }, 1500);
+                            })
+                            .catch(err => {
+                                console.error('Could not copy text: ', err);
+                                // Fallback to old method
+                                fallbackCopy();
+                            });
+                    } else {
+                        // Fallback for older browsers
+                        fallbackCopy();
+                    }
+                    
+                    function fallbackCopy() {
+                        input.select();
+                        document.execCommand('copy');
+                        
+                        // Update tooltip text
+                        const tooltip = btn.querySelector('.tooltiptext');
+                        const originalText = tooltip.textContent;
+                        tooltip.textContent = 'Copied!';
+                        
+                        // Reset tooltip text after delay
+                        setTimeout(() => {
+                            tooltip.textContent = originalText;
+                        }, 1500);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.faq-item .faq-question').forEach(question => {
+                question.addEventListener('click', function() {
+                    const faqItem = this.parentElement;
+                    const isActive = faqItem.classList.contains('active');
+                    
+                    // Close all other FAQ items
+                    document.querySelectorAll('.faq-item').forEach(item => {
+                        if (item !== faqItem) {
+                            item.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle the clicked FAQ item
+                    if (!isActive) {
+                        faqItem.classList.add('active');
+                    } else {
+                        faqItem.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        async function loadStats() {
+            const statsContainer = document.getElementById('stats-container');
+            const errorMessage = document.getElementById('error-message');
+            
+            try {
+                const response = await fetch('main.php?action=stats', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+        
+                const text = await response.text();
+                let data;
+                
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Invalid JSON response: ' + text.substring(0, 100));
+                }
+                
+                if (data.status === 'success') {
+                    // Format numbers with commas for thousands
+                    const formatNumber = (num) => {
+                        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    };
+                    
+                    statsContainer.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-link"></i></div>
+                            <div class="stat-number">${formatNumber(data.data.total_links)}</div>
+                            <div class="stat-label">Total Links</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-mouse-pointer"></i></div>
+                            <div class="stat-number">${formatNumber(data.data.total_clicks)}</div>
+                            <div class="stat-label">Total Clicks</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-number">${formatNumber(data.data.active_links)}</div>
+                            <div class="stat-label">Active Links</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-lock"></i></div>
+                            <div class="stat-number">${formatNumber(data.data.password_protected)}</div>
+                            <div class="stat-label">Password Protected</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="stat-number">${data.data.average_clicks}</div>
+                            <div class="stat-label">Avg Clicks per Link</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                            <div class="stat-number">${formatNumber(data.data.last_24h_created)}</div>
+                            <div class="stat-label">Created Last 24h</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                            <div class="stat-number">${formatNumber(data.data.last_24h_clicks)}</div>
+                            <div class="stat-label">Clicks Last 24h</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                            <div class="stat-number">${formatNumber(data.data.most_clicked)}</div>
+                            <div class="stat-label">Most Clicked Link</div>
+                        </div>
+                    `;
+                    errorMessage.style.display = 'none';
+                } else {
+                    throw new Error(data.message || 'Unknown error occurred');
+                }
+            } catch (error) {
+                console.error('Stats loading error:', error);
+                statsContainer.innerHTML = '';
+                errorMessage.textContent = 'Error loading statistics: ' + error.message;
+                errorMessage.style.display = 'block';
+            }
+        }
+        
+        window.addEventListener('load', loadStats);
+    </script>
+</body>
+</html>
